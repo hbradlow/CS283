@@ -1,5 +1,7 @@
-#include <iostream>
+#include "mesh.cpp"
+#include "world.cpp"
 #include <glut.h>
+#include <iostream>
 
 using namespace std;
 
@@ -17,9 +19,11 @@ float mouse_y = -1;
 bool move = false;
 bool zoom = false;
 
+World world;
+
 void keyboard(unsigned char key, int x, int y){
     switch(key){
-        case 'm':
+        case 'x':
             move = true; break;
         case 'z':
             zoom = true; break;
@@ -29,7 +33,7 @@ void keyboard(unsigned char key, int x, int y){
 }
 void keyboard_up(unsigned char key, int x, int y){
     switch(key){
-        case 'm':
+        case 'x':
             move = false; break;
         case 'z':
             zoom = false; break;
@@ -41,9 +45,11 @@ void display(){
     glPushMatrix();
         glTranslatef(screen_x,screen_y,0);
         glRotatef(angle1,0,0,1);
-        glRotatef(angle2,0,1,0);
+        glRotatef(angle2,1,0,0);
         glScalef(scale,scale,scale);
-        glutWireSphere(.5f,40,24);
+
+        world.display();
+
     glPopMatrix();
 
     glFlush();
@@ -86,10 +92,13 @@ void mouse_dragged(int x, int y){
 void idle(){
 }
 void reshape(int w, int h){
+    glViewport( 0, 0, w, h);
+    glutPostRedisplay();
 }
 
 int main(int argc, char* argv[]){
 
+    //set up basic window
     glutInit(&argc, argv);
 
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH); // set RGBA mode with double and depth buffers
@@ -98,6 +107,9 @@ int main(int argc, char* argv[]){
     glutInitWindowSize(size,size);
     glutInitWindowPosition(0,0);
     glutCreateWindow("Test");
+
+    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
 
     //set callbacks
     glutDisplayFunc(display);
@@ -111,6 +123,14 @@ int main(int argc, char* argv[]){
 
     glutIdleFunc(idle);
 
+    Mesh m;
+    if(argc>1)
+        m.loadFromFile(argv[1]);
+    else
+        m.loadFromFile("../data/bunny.off");
+    world.addMesh(m);
+
+    //start
     glutMainLoop();
 
     return 0;
