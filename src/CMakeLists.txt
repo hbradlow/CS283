@@ -1,5 +1,5 @@
 include_directories(
-    ${GLUT_INCLUDE_DIR} 
+    ${GLUT_INCLUDE_DIR}/GL 
     ${EIGEN_INCLUDE_DIR}
 )
 
